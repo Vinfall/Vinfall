@@ -1,0 +1,58 @@
+name: Build
+
+on:
+  schedule:
+    - cron: "0 4/24 * * *" # 4:00 UTC every day
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions: {}
+
+jobs:
+  build:
+    permissions:
+      contents: write # required to push
+    runs-on: ubuntu-slim
+    strategy:
+      matrix:
+        python-version: ["3.14"]
+    timeout-minutes: 10
+    env:
+      filename: invader.webp
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: output
+          persist-credentials: true
+
+      - name: setup
+        id: setup-mise
+        uses: jdx/mise-action@v3
+        with:
+          install: true
+          cache: true
+          tool_versions: |
+            python ${{ matrix.python-version }}
+            uv latest
+
+      - name: generate
+        run: uvx gh-space-shooter "${username}" --strategy random --output "${filename}"
+        env:
+          username: Vinfall
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: commit
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add -A
+          git commit --amend --no-edit
+
+      - name: push
+        uses: ad-m/github-push-action@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: output
+          force: True
