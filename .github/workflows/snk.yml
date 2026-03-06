@@ -7,10 +7,14 @@ on:
   workflow_dispatch:
   push:
     branches:
-    - main
+      - main
+
+permissions: {}
 
 jobs:
   generate:
+    permissions:
+      contents: write # required to push
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
