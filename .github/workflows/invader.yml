@@ -38,9 +38,8 @@ jobs:
             uv latest
 
       - name: generate
-        run: uvx gh-space-shooter "${username}" --strategy random --output "${filename}"
+        run: uvx gh-space-shooter ${{ github.repository_owner }} --strategy random --output "${filename}"
         env:
-          username: Vinfall
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: commit
