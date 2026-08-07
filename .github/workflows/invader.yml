@@ -1,14 +1,14 @@
 name: Build
 
+permissions: {}
+
 on:
   schedule:
-    - cron: "0 4/24 * * *" # 4:00 UTC every day
+    - cron: 0 18 * * * # 2:00 UTC+8 everyday
   workflow_dispatch:
   push:
     branches:
       - main
-
-permissions: {}
 
 jobs:
   build:
@@ -26,6 +26,7 @@ jobs:
         with:
           ref: output
           persist-credentials: true
+          fetch-depth: 2
 
       - name: setup
         id: setup-mise
@@ -33,12 +34,14 @@ jobs:
         with:
           install: true
           cache: true
+          cache_key_prefix: "nightly"
           tool_versions: |
             python ${{ matrix.python-version }}
             uv latest
+            pipx:gh-space-shooter latest
 
       - name: generate
-        run: uvx gh-space-shooter ${{ github.repository_owner }} --strategy random --output "${filename}"
+        run: gh-space-shooter ${{ github.repository_owner }} --strategy random --output "${filename}"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -49,5 +52,3 @@ jobs:
           git add -A
           git commit --amend --no-edit
           git push origin output --force
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
