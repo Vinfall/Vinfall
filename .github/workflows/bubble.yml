@@ -15,12 +15,9 @@ jobs:
     permissions:
       contents: write # required to push
     runs-on: ubuntu-26.04
-    strategy:
-      matrix:
-        python-version: ["3.14"]
     timeout-minutes: 10
     env:
-      filename: invader.webp
+      filename: bubble.svg
     steps:
       - uses: actions/checkout@v7
         with:
@@ -36,14 +33,12 @@ jobs:
           cache: true
           cache_key_prefix: "nightly"
           tool_versions: |
-            python ${{ matrix.python-version }}
-            uv latest
-            pipx:gh-space-shooter 2.0.3
+            node lts
+            aube latest
+            npm:pacman-contribution-graph latest
 
       - name: generate
-        run: gh-space-shooter ${{ github.repository_owner }} --strategy random --output "${filename}"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: pacman-contribution-graph --game puzzle-bobble --username ${{ github.repository_owner }} --platform github --gameTheme github-dark --output "${filename}"
 
       - name: commit
         run: |
