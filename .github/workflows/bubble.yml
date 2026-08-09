@@ -32,10 +32,17 @@ jobs:
           install: true
           cache: true
           cache_key_prefix: "nightly"
-          tool_versions: |
-            node lts
-            aube latest
-            npm:pacman-contribution-graph latest
+          mise_toml: |
+            [settings.npm]
+            package_manager = "aube"
+            shell_out = true
+            [tools]
+            node = "lts"
+            aube = "latest"
+            "npm:pacman-contribution-graph" = {
+              version = "latest",
+              trust_policy_excludes = ["pacman-contribution-graph"]
+            }
 
       - name: generate
         run: pacman-contribution-graph --game puzzle-bobble --username ${{ github.repository_owner }} --platform github --gameTheme github-dark --output "${filename}"
